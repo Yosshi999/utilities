@@ -19,7 +19,5 @@ trap rm_tmpfile EXIT
 trap 'trap - EXIT; rm_tmpfile; exit -1' INT PIPE TERM
 
 # save cookie and set to the param
-# https://qiita.com/namakemono/items/c963e75e0af3f7eed732
-curl -sc ${TEMP_FILE} "https://drive.google.com/uc?export=download&id=${FILE_ID}" > /dev/null
-CODE="$(awk '/_warning_/ {print $NF}' ${TEMP_FILE})"  
-curl -Lb ${TEMP_FILE} "https://drive.google.com/uc?export=download&confirm=${CODE}&id=${FILE_ID}" -o ${FILE_NAME}
+UUID=`curl -sc ${TEMP_FILE} "https://drive.google.com/uc?export=download&id=${FILE_ID}" | grep -oP 'action=.*uuid=\K[^"]+(?=")'`
+curl -Lb ${TEMP_FILE} "https://drive.google.com/uc?export=download&confirm=t&id=${FILE_ID}&uuid=${UUID}" -o ${FILE_NAME}
